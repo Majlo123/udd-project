@@ -1,0 +1,103 @@
+<div class="search-header">
+  <h1>Pretraga Forenzičkih Izveštaja</h1>
+  <p>Pretražite izveštaje po sadržaju, klasifikaciji, istražitelju ili lokaciji</p>
+</div>
+
+<!-- Advanced Search Help -->
+<div class="help-box" *ngIf="advancedSearch">
+  <strong>Napredna Boolean pretraga (Stack Machine)</strong><br>
+  Koristite operatore:
+  <code>AND</code> <code>OR</code> <code>NOT</code> i zagrade <code>( )</code><br>
+  Pretraga po polju: <code>classification:Ransomware</code><br>
+  Fraze: <code>"enkripcija fajlova"</code><br>
+  Primer: <code>(malware:WannaCry OR description:"enkripcija fajlova") AND NOT classification:Spyware</code>
+</div>
+
+<!-- Search Box -->
+<div class="card">
+  <div class="search-box">
+    <input
+      class="search-input"
+      type="text"
+      [(ngModel)]="query"
+      [placeholder]="advancedSearch ? 'Napredna pretraga: (malware:WannaCry OR description:virus) AND NOT classification:Spyware' : 'Unesite termin za pretragu...'"
+      (keyup.enter)="onSearch()"
+    />
+    <button class="btn btn-primary" (click)="onSearch()" [disabled]="loading">
+      {{ loading ? 'Pretražujem...' : 'Pretraži' }}
+    </button>
+  </div>
+
+  <div class="toggle-row">
+    <label class="toggle-item">
+      <input type="checkbox" [(ngModel)]="advancedSearch" />
+      Napredna (Boolean) pretraga
+    </label>
+    <label class="toggle-item">
+      <input type="checkbox" [(ngModel)]="includeGeo" />
+      Uključi geo-lokacijsku pretragu
+    </label>
+  </div>
+
+  <!-- Geo Search Fields -->
+  <div class="geo-fields" *ngIf="includeGeo">
+    <div class="form-group">
+      <label>Latitude</label>
+      <input type="number" step="0.0001" [(ngModel)]="latitude" placeholder="44.7866" />
+    </div>
+    <div class="form-group">
+      <label>Longitude</label>
+      <input type="number" step="0.0001" [(ngModel)]="longitude" placeholder="20.4489" />
+    </div>
+    <div class="form-group">
+      <label>Radijus (km)</label>
+      <input type="number" [(ngModel)]="radiusKm" placeholder="50" />
+    </div>
+  </div>
+</div>
+
+<!-- Loading -->
+<div class="loading" *ngIf="loading">
+  Pretražujem Elasticsearch bazu...
+</div>
+
+<!-- Results -->
+<div *ngIf="!loading && searched">
+  <p class="results-count">Pronađeno rezultata: <strong>{{ results.length }}</strong></p>
+
+  <div *ngIf="results.length === 0" class="no-results">
+    Nema rezultata za datu pretragu. Pokušajte sa drugačijim terminima.
+  </div>
+
+  <div *ngFor="let report of results" class="result-card">
+    <div class="result-header">
+      <div>
+        <span class="result-title">
+          {{ report.malwareName || 'Nepoznat malver' }}
+        </span>
+        <span [class]="getClassBadge(report.classification)" style="margin-left: 10px;">
+          {{ report.classification }}
+        </span>
+      </div>
+      <button class="btn btn-secondary" (click)="downloadPdf(report.id)" style="font-size: 12px; padding: 6px 12px;">
+        &#x2B07; PDF
+      </button>
+    </div>
+
+    <div class="result-meta">
+      <span>&#128100; {{ report.forensicInvestigator }}</span>
+      <span>&#127970; {{ report.organization }}</span>
+      <span>&#128205; {{ report.city }}</span>
+      <span *ngIf="report.location">
+        &#127758; {{ report.location.lat.toFixed(4) }}, {{ report.location.lon.toFixed(4) }}
+      </span>
+    </div>
+
+    <div class="result-content" *ngIf="report.description">
+      <strong>Opis:</strong> {{ truncate(report.description) }}
+    </div>
+    <div class="result-content" *ngIf="report.content" style="margin-top: 6px;">
+      <strong>Sadržaj:</strong> {{ truncate(report.content, 300) }}
+    </div>
+  </div>
+</div>

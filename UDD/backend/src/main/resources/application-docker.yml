@@ -1,0 +1,16 @@
+# Docker profile — overrides localhost with Docker service names
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/udd_db
+  elasticsearch:
+    uris: http://elasticsearch:9200
+
+minio:
+  url: http://minio:9000
+
+tika:
+  url: http://tika:9998
+
+# Logs go to /app/logs which is mounted as a volume shared with Logstash
+logging:
+  config: classpath:logback-spring.xml

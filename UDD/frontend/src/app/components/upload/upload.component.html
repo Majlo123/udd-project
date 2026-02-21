@@ -1,0 +1,111 @@
+<div class="upload-header">
+  <h1>Novi Forenzički Izveštaj</h1>
+  <p>Popunite metapodatke — sistem automatski generiše PDF dokument</p>
+</div>
+
+<div class="success-msg" *ngIf="successMessage">{{ successMessage }}</div>
+<div class="error-msg" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+<div class="card">
+  <form (ngSubmit)="onSubmit()">
+    <div class="form-grid">
+      <!-- Forenzičar -->
+      <div class="form-group">
+        <label>Forenzički istražitelj *</label>
+        <input type="text" [(ngModel)]="dto.forensicInvestigator" name="forensicInvestigator"
+               placeholder="Ime i prezime" required />
+      </div>
+
+      <!-- Organizacija -->
+      <div class="form-group">
+        <label>Organizacija *</label>
+        <input type="text" [(ngModel)]="dto.organization" name="organization"
+               placeholder="Naziv organizacije" required />
+      </div>
+
+      <!-- Malver -->
+      <div class="form-group">
+        <label>Naziv malvera</label>
+        <input type="text" [(ngModel)]="dto.malwareName" name="malwareName"
+               placeholder="npr. WannaCry" />
+      </div>
+
+      <!-- Clasificacija -->
+      <div class="form-group">
+        <label>Klasifikacija *</label>
+        <select [(ngModel)]="dto.classification" name="classification" required>
+          <option *ngFor="let c of classifications" [value]="c">{{ c }}</option>
+        </select>
+      </div>
+
+      <!-- Grad -->
+      <div class="form-group">
+        <label>Grad *</label>
+        <input type="text" [(ngModel)]="dto.city" name="city"
+               placeholder="npr. Beograd" required />
+      </div>
+
+      <!-- Latitude -->
+      <div class="form-group">
+        <label>Latitude (opciono)</label>
+        <input type="number" step="0.0001" [(ngModel)]="dto.latitude" name="latitude"
+               placeholder="44.7866" />
+      </div>
+
+      <!-- Longitude -->
+      <div class="form-group">
+        <label>Longitude (opciono)</label>
+        <input type="number" step="0.0001" [(ngModel)]="dto.longitude" name="longitude"
+               placeholder="20.4489" />
+      </div>
+
+      <!-- Opis -->
+      <div class="form-group form-full">
+        <label>Opis</label>
+        <textarea [(ngModel)]="dto.description" name="description" rows="3"
+                  placeholder="Kratak opis incidenta..."></textarea>
+      </div>
+
+      <!-- PDF opcije -->
+      <div class="form-group form-full">
+        <div class="pdf-toggle" [class.manual]="!autoGeneratePdf">
+          <label class="toggle-switch">
+            <input type="checkbox" [(ngModel)]="autoGeneratePdf" name="autoGeneratePdf" />
+            <span class="toggle-slider"></span>
+          </label>
+          <div>
+            <label>Automatsko generisanje PDF-a</label><br />
+            <small *ngIf="autoGeneratePdf">Sistem će sam napraviti PDF iz podataka forme — ne morate ništa uploadovati.</small>
+            <small *ngIf="!autoGeneratePdf">Ručni upload — priložite sopstveni PDF dokument.</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- File Upload (samo ako je ručni mod) -->
+      <div class="form-group form-full" *ngIf="!autoGeneratePdf">
+        <label>PDF Dokument *</label>
+        <div class="file-drop" [class.active]="selectedFile" (click)="fileInput.click()">
+          <input #fileInput type="file" accept=".pdf" (change)="onFileSelected($event)" hidden />
+          <div *ngIf="!selectedFile">
+            <span style="font-size: 32px;">&#128196;</span>
+            <p>Kliknite da izaberete PDF fajl</p>
+          </div>
+          <div *ngIf="selectedFile">
+            <span style="font-size: 32px;">&#9989;</span>
+            <p class="file-name">{{ selectedFile.name }}</p>
+            <p>{{ (selectedFile.size / 1024 / 1024).toFixed(2) }} MB</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" [disabled]="uploading">
+        {{ uploading ? 'Kreiranje...' : 'Kreiraj Izveštaj' }}
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="resetForm()">
+        Poništi
+      </button>
+    </div>
+  </form>
+</div>

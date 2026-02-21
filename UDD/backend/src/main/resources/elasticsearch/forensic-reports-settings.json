@@ -1,0 +1,25 @@
+{
+  "analysis": {
+    "filter": {
+      "serbian_stop": {
+        "type": "stop",
+        "stopwords": ["i", "ili", "da", "se", "je", "u", "na", "za", "sa", "iz", "po", "od", "do", "ne", "ni", "su", "bi", "ce", "ce", "sto", "sta", "koji", "koja", "koje", "kao", "ali", "a", "o", "te", "to", "taj", "ta", "tu", "ova", "ovo", "ovi", "ona", "ono", "oni", "sve", "svi", "svaki", "bio", "bila", "bilo", "biti", "bude", "budu", "sam", "si", "smo", "ste", "ima", "imao", "imala", "moze", "mogu", "vec", "jos", "kad", "kako", "gde", "dok", "samo", "tek", "jer"]
+      },
+      "serbian_stemmer": {
+        "type": "stemmer",
+        "language": "serbian"
+      }
+    },
+    "analyzer": {
+      "serbian": {
+        "type": "custom",
+        "tokenizer": "standard",
+        "filter": [
+          "lowercase",
+          "serbian_stop",
+          "serbian_stemmer"
+        ]
+      }
+    }
+  }
+}
